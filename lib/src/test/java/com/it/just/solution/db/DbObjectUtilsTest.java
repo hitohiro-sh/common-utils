@@ -133,36 +133,32 @@ public class DbObjectUtilsTest {
 			Class.forName("org.postgresql.Driver");
 		    Connection conn =
 		    	    DriverManager.getConnection
-		    	    ("jdbc:postgresql://localhost:5432/postgres", "user", "pass");
+		    	    ("jdbc:postgresql://localhost:5432/postgres", "dbuser", "pass");
 		    Statement s = conn.createStatement();
-		    ResultSet rs = s.executeQuery("select distinct code from record");
-		    List<Result> list = new ArrayList<>();
+
+		    s.executeUpdate("drop table if exists record2");
+            s.executeUpdate("create table record2 (code varchar primary key, value int)");
+			s.executeUpdate("insert into record2 values ('C0001', 10)");
+			s.executeUpdate("insert into record2 values ('C0002', 20)");
+			ResultSet rs = s.executeQuery("select * from record2 order by code");
+		    List<Result2> list = new ArrayList<>();
 		    while (rs.next()) {
-		    	Result row = new Result();
+		    	var row = new Result2();
 		    	DbObjectUtils.fillObject(rs, row);
 		    	list.add(row);
 		    }
-		    for (Result r : list) {
+			assertEquals(2, list.size());
+			assertEquals("C0001", list.get(0).getCode());
+			assertEquals(Integer.valueOf(10), list.get(0).getValue());
+		    for (Result2 r : list) {
 		    	System.out.println(r.getCode());
 		    }
 		    list.clear();
 		    rs.close();
 		    s.close();
-		    s = conn.createStatement();
-		    rs = s.executeQuery("select code, t_date, open_val from record where code = '0000.A'");
-		    while (rs.next()) {
-		    	Result row = new Result();
-		    	DbObjectUtils.fillObject(rs, row);
-		    	list.add(row);
-		    }
-		    for (Result r : list) {
-		    	System.out.println(r.getCode() + ":" + r.getTDate() + ":" + r.getOpenVal());
-		    }
-		    PreparedStatement ps = conn.prepareStatement("update stock set open_val = ? where code = ? and t_date = ?");
-		    
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO 自動生成された catch ブロック
-			// fail(e.getMessage());
+			fail(e.getMessage());
 			// e.printStackTrace();
 			
 		}
