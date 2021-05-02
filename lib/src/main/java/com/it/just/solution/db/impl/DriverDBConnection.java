@@ -41,10 +41,20 @@ public class DriverDBConnection implements DBConnection {
 		}
 	}
 	
+	public DriverDBConnection(String driver, String connString) throws ClassNotFoundException, SQLException {
+		try {
+			Class.forName(driver);
+
+
+			this.conn = DriverManager.getConnection(connString);
+		} catch (ClassNotFoundException | SQLException e) {
+			Logger.getLogger(DriverDBConnection.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+	}
 
 	@Override
 	public Connection getConnection() throws NamingException, SQLException {
-		// TODO 自動生成されたメソッド・スタブ
 		return this.conn;
 	}
 	

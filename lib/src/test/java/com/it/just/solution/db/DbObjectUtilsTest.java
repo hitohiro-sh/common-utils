@@ -29,6 +29,31 @@ public class DbObjectUtilsTest {
 	public void setUp() throws Exception {
 	}
 
+	private class Result2 {
+		private String code;
+		private Integer value;
+
+		@Column(name="code",constraint="key")
+		public String getCode() {
+			return code;
+		}
+		
+		@Column(name="code",constraint="key")
+		public void setCode(String code) {
+			this.code = code;
+		}
+
+		@Column(name="value",constraint="none")
+		public Integer getValue() {
+			return value;
+		}
+
+		@Column(name="value",constraint="none")
+		public void setValue(Integer value) {
+			this.value = value;
+		}
+
+	}
 	
 	private class Result {
 		private String code;
@@ -66,6 +91,40 @@ public class DbObjectUtilsTest {
 		}
 	}
 	
+	@Test
+	public void testFillObject2() {
+		try {
+			Class.forName("org.sqlite.JDBC");
+			// create a database connection
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:sample.db");
+          	Statement s = conn.createStatement();
+          	s.setQueryTimeout(30);  // set timeout to 30 sec.
+
+            s.executeUpdate("drop table if exists record2");
+            s.executeUpdate("create table record2 (code string primary key, value integer)");
+			s.executeUpdate("insert into record2 values ('C0001', 1)");
+			s.executeUpdate("insert into record2 values ('C0002', 2)");
+			ResultSet rs = s.executeQuery("select * from record2 order by code");
+		    List<Result2> list = new ArrayList<>();
+		    while (rs.next()) {
+		    	var row = new Result2();
+		    	DbObjectUtils.fillObject(rs, row);
+		    	list.add(row);
+		    }
+			assertEquals(2, list.size());
+			assertEquals("C0001", list.get(0).getCode());
+		    for (Result2 r : list) {
+		    	System.out.println(r.getCode());
+		    }
+		    list.clear();
+		    rs.close();
+		    s.close();
+		} catch (ClassNotFoundException | SQLException e) {
+			fail(e.getMessage());
+			// e.printStackTrace();
+		}
+	}
+
 	@Test
 	public void testFillObject() {
 		
