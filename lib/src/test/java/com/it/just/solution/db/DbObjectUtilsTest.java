@@ -102,8 +102,8 @@ public class DbObjectUtilsTest {
 
             s.executeUpdate("drop table if exists record2");
             s.executeUpdate("create table record2 (code string primary key, value integer)");
-			s.executeUpdate("insert into record2 values ('C0001', 1)");
-			s.executeUpdate("insert into record2 values ('C0002', 2)");
+			s.executeUpdate("insert into record2 values ('C0001', 10)");
+			s.executeUpdate("insert into record2 values ('C0002', 20)");
 			ResultSet rs = s.executeQuery("select * from record2 order by code");
 		    List<Result2> list = new ArrayList<>();
 		    while (rs.next()) {
@@ -113,6 +113,7 @@ public class DbObjectUtilsTest {
 		    }
 			assertEquals(2, list.size());
 			assertEquals("C0001", list.get(0).getCode());
+			assertEquals(Integer.valueOf(10), list.get(0).getValue());
 		    for (Result2 r : list) {
 		    	System.out.println(r.getCode());
 		    }
