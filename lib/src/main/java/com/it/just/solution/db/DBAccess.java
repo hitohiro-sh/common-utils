@@ -24,13 +24,12 @@ public class DBAccess implements AutoCloseable {
 		return this.connection.getConnection();
 	}
 	
-	public <T> List<T> select(DbQuery q, T entity) throws NamingException, SQLException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	public <T> List<T> select(DbQuery q, Class<T> entityClass) throws NamingException, SQLException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		Connection conn = this.getConnection();
 		List<T> ret = new ArrayList<>();
 		PreparedStatement s = null;
 		ResultSet rs = null;
 		try {
-			Class<T> entityClass = (Class<T>)entity.getClass();
 			var cons = entityClass.getDeclaredConstructor();
 			s = conn.prepareStatement(q.getSql());
 			for (int i = 0; i < q.getValues().size(); i++) {
@@ -54,7 +53,7 @@ public class DBAccess implements AutoCloseable {
 		return ret;
 	}
 	
-	public <T> List<T> select(String sql, T entity) throws NamingException, SQLException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	public <T> List<T> select(String sql, Class<T> entityClass) throws NamingException, SQLException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		Connection conn = this.getConnection();
 		List<T> ret = new ArrayList<>();
 		Statement s = null;
@@ -62,9 +61,7 @@ public class DBAccess implements AutoCloseable {
 		try {
 			s = conn.createStatement();
 			rs = s.executeQuery(sql);
-			Class<T> entityClass = (Class<T>)entity.getClass();
 			var cons = entityClass.getDeclaredConstructor();
-			// System.out.println(cons.getName());
 			while (rs.next()) {
 				T obj = cons.newInstance();
 				DbObjectUtils.fillObject(rs, obj);

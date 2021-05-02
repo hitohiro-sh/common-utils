@@ -81,7 +81,7 @@ public class DBAccessTest {
             ret = db.execute("create table record2 (code string primary key, value integer)");
             assertEquals(0, ret);
 
-            var list = db.select("select * from record2 order by code", new Result3());
+            var list = db.select("select * from record2 order by code", Result3.class);
             assertEquals(0, list.size());
 
             db.insert("record2", new Result3("C0003", 30));
@@ -90,12 +90,12 @@ public class DBAccessTest {
             // db.close();
             // db = new DBAccess(new DriverDBConnection("org.sqlite.JDBC", "jdbc:sqlite:sample.db"));
             
-            list = db.select("select * from record2 order by code", new Result3());
+            list = db.select("select * from record2 order by code", Result3.class);
             assertEquals(2, list.size());
 			assertEquals("C0003", list.get(0).getCode());
 			assertEquals(Integer.valueOf(30), list.get(0).getValue());
 
-            list = db.select(DbQueryUtils.selectQuery("record2", new Result3Key("C0003")), new Result3());
+            list = db.select(DbQueryUtils.selectQuery("record2", new Result3Key("C0003")), Result3.class);
             assertEquals(1, list.size());
 			assertEquals("C0003", list.get(0).getCode());
 			assertEquals(Integer.valueOf(30), list.get(0).getValue());
