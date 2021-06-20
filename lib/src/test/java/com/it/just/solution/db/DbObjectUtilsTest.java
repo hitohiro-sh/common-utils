@@ -92,52 +92,17 @@ public class DbObjectUtilsTest {
 	}
 	
 	@Test
-	public void testFillObject2() {
-		try {
-			Class.forName("org.sqlite.JDBC");
-			// create a database connection
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:sample.db");
-          	Statement s = conn.createStatement();
-          	s.setQueryTimeout(30);  // set timeout to 30 sec.
-
-            s.executeUpdate("drop table if exists record2");
-            s.executeUpdate("create table record2 (code string primary key, value integer)");
-			s.executeUpdate("insert into record2 values ('C0001', 10)");
-			s.executeUpdate("insert into record2 values ('C0002', 20)");
-			ResultSet rs = s.executeQuery("select * from record2 order by code");
-		    List<Result2> list = new ArrayList<>();
-		    while (rs.next()) {
-		    	var row = new Result2();
-		    	DbObjectUtils.fillObject(rs, row);
-		    	list.add(row);
-		    }
-			assertEquals(2, list.size());
-			assertEquals("C0001", list.get(0).getCode());
-			assertEquals(Integer.valueOf(10), list.get(0).getValue());
-		    for (Result2 r : list) {
-		    	System.out.println(r.getCode());
-		    }
-		    list.clear();
-		    rs.close();
-		    s.close();
-		} catch (ClassNotFoundException | SQLException e) {
-			fail(e.getMessage());
-			// e.printStackTrace();
-		}
-	}
-
-	@Test
-	public void testFillObject() {
+	public void testFillObject3() {
 		
 		try {
-			Class.forName("org.postgresql.Driver");
+			Class.forName("com.mysql.jdbc.Driver");
 		    Connection conn =
 		    	    DriverManager.getConnection
-		    	    ("jdbc:postgresql://localhost:5432/postgres", "dbuser", "pass");
+		    	    ("jdbc:mysql://localhost:3306/mysql", "mydbuser", "pass");
 		    Statement s = conn.createStatement();
 
 		    s.executeUpdate("drop table if exists record2");
-            s.executeUpdate("create table record2 (code varchar primary key, value int)");
+            s.executeUpdate("create table record2 (code varchar(10) primary key, value int)");
 			s.executeUpdate("insert into record2 values ('C0001', 10)");
 			s.executeUpdate("insert into record2 values ('C0002', 20)");
 			ResultSet rs = s.executeQuery("select * from record2 order by code");
