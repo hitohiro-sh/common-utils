@@ -114,46 +114,4 @@ public class DBAccessTest {
 		}
 	}
 
-	@Test
-	public void testSelect2() {
-		try {
-            int ret;
-            var db = new DBAccess(new DriverDBConnection("org.postgresql.Driver", "jdbc:postgresql://localhost:5432/postgres", "dbuser", "pass"));
-            ret = db.execute("drop table if exists record2");
-            assertEquals(0, ret);
-            ret = db.execute("create table record2 (code varchar primary key, value int)");
-            assertEquals(0, ret);
-
-            var list = db.select("select * from record2 order by code", Result3.class);
-            assertEquals(0, list.size());
-
-            db.insert("record2", new Result3("C0003", 30));
-            db.insert("record2", new Result3("COOO4", 40));
-			// db.execute("insert into record2 values ('C0003', 30)");
-            // db.close();
-            // db = new DBAccess(new DriverDBConnection("org.sqlite.JDBC", "jdbc:sqlite:sample.db"));
-            
-            list = db.select("select * from record2 order by code", Result3.class);
-            assertEquals(2, list.size());
-			assertEquals("C0003", list.get(0).getCode());
-			assertEquals(Integer.valueOf(30), list.get(0).getValue());
-
-            list = db.select(DbQueryUtils.selectQuery("record2", new Result3Key("C0003")), Result3.class);
-            assertEquals(1, list.size());
-			assertEquals("C0003", list.get(0).getCode());
-			assertEquals(Integer.valueOf(30), list.get(0).getValue());
-
-		} catch (ClassNotFoundException | 
-            SQLException | 
-            NamingException | 
-            InstantiationException | 
-            IllegalAccessException | 
-            InvocationTargetException |
-            NoSuchMethodException
-            e) {
-            System.err.println(e.getMessage());
-			fail(e.getMessage());
-			// e.printStackTrace();
-		}
-	}
 }

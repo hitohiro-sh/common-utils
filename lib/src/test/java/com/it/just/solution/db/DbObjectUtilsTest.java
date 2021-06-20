@@ -125,45 +125,4 @@ public class DbObjectUtilsTest {
 			// e.printStackTrace();
 		}
 	}
-
-	@Test
-	public void testFillObject() {
-		
-		try {
-			Class.forName("org.postgresql.Driver");
-		    Connection conn =
-		    	    DriverManager.getConnection
-		    	    ("jdbc:postgresql://localhost:5432/postgres", "dbuser", "pass");
-		    Statement s = conn.createStatement();
-
-		    s.executeUpdate("drop table if exists record2");
-            s.executeUpdate("create table record2 (code varchar primary key, value int)");
-			s.executeUpdate("insert into record2 values ('C0001', 10)");
-			s.executeUpdate("insert into record2 values ('C0002', 20)");
-			ResultSet rs = s.executeQuery("select * from record2 order by code");
-		    List<Result2> list = new ArrayList<>();
-		    while (rs.next()) {
-		    	var row = new Result2();
-		    	DbObjectUtils.fillObject(rs, row);
-		    	list.add(row);
-		    }
-			assertEquals(2, list.size());
-			assertEquals("C0001", list.get(0).getCode());
-			assertEquals(Integer.valueOf(10), list.get(0).getValue());
-		    for (Result2 r : list) {
-		    	System.out.println(r.getCode());
-		    }
-		    list.clear();
-		    rs.close();
-		    s.close();
-		} catch (ClassNotFoundException | SQLException e) {
-			// TODO 自動生成された catch ブロック
-			fail(e.getMessage());
-			// e.printStackTrace();
-			
-		}
-		
-		// fail("まだ実装されていません");
-	}
-
 }
