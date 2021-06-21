@@ -1,1 +1,0 @@
-GRANT ALL PRIVILEGES ON mysql.* TO 'mydbuser'@'localhost' WITH GRANT OPTION;
