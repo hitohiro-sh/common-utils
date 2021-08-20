@@ -24,19 +24,20 @@ public class DBAccess implements AutoCloseable {
 		return this.connection.getConnection();
 	}
 	
-	public <T> List<T> select(DbQuery q, Class<T> entityClass) throws NamingException, SQLException, InstantiationException, IllegalAccessException {
+	public <T> List<T> select(DbQuery q, Class<T> entityClass) throws NamingException, SQLException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		Connection conn = this.getConnection();
 		List<T> ret = new ArrayList<>();
 		PreparedStatement s = null;
 		ResultSet rs = null;
 		try {
+			var cons = entityClass.getDeclaredConstructor();
 			s = conn.prepareStatement(q.getSql());
 			for (int i = 0; i < q.getValues().size(); i++) {
 				s.setObject(i + 1, q.getValues().get(i));
 			}
 			rs = s.executeQuery();
 			while (rs.next()) {
-				T obj = entityClass.newInstance();
+				T obj = cons.newInstance();
 				DbObjectUtils.fillObject(rs, obj);
 				
 				ret.add(obj);
@@ -52,7 +53,7 @@ public class DBAccess implements AutoCloseable {
 		return ret;
 	}
 	
-	public <T> List<T> select(String sql, Class<T> entityClass) throws NamingException, SQLException, InstantiationException, IllegalAccessException {
+	public <T> List<T> select(String sql, Class<T> entityClass) throws NamingException, SQLException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		Connection conn = this.getConnection();
 		List<T> ret = new ArrayList<>();
 		Statement s = null;
@@ -60,8 +61,9 @@ public class DBAccess implements AutoCloseable {
 		try {
 			s = conn.createStatement();
 			rs = s.executeQuery(sql);
+			var cons = entityClass.getDeclaredConstructor();
 			while (rs.next()) {
-				T obj = entityClass.newInstance();
+				T obj = cons.newInstance();
 				DbObjectUtils.fillObject(rs, obj);
 				
 				ret.add(obj);
@@ -80,15 +82,13 @@ public class DBAccess implements AutoCloseable {
 	public <T> int insert(String tablename, T entity) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NamingException, SQLException {
 		DbQuery q = DbQueryUtils.insertQuery(tablename, entity);
 		Connection conn = this.getConnection();
-		// List<T> ret = new ArrayList<>();
+
 		PreparedStatement s = null;
-		// ResultSet rs = null;
 		try {
 			s = conn.prepareStatement(q.getSql());
 			for (int i = 0; i < q.getValues().size(); i++) {
 				s.setObject(i + 1, q.getValues().get(i));
 			}
-			// rs = s.executeQuery();
 			return s.executeUpdate();
 			
 		} finally {
@@ -126,10 +126,10 @@ public class DBAccess implements AutoCloseable {
 	public int execute(String sql) throws NamingException, SQLException {
 		Connection conn = this.getConnection();
 		// List<T> ret = new ArrayList<>();
-		PreparedStatement s = null;
+		Statement s = null;
 		try {
-			s = conn.prepareStatement(sql);
-			return s.executeUpdate();
+			s = conn.createStatement();
+			return s.executeUpdate(sql);
 			
 		} finally {
 
@@ -141,8 +141,10 @@ public class DBAccess implements AutoCloseable {
 	
 	
 	@Override
-	public void close() throws Exception {
-		this.connection.close();
+	public void close() {
+		try {
+			this.connection.close();
+		} catch (Exception e) {}
 		
 	}
 }
