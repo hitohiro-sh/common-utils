@@ -1,7 +1,7 @@
 # common-utils
 
-Tiny utilities for access relational database.
+Simple utilities for access a relational database.
 
 # Future Works
 
-Maybe support NoSQL.
+Support for NoSQL.
